@@ -4,6 +4,7 @@ from math import sqrt
 
 
 def computeSSE(m, p, q):
+    [m_row, m_col, m_val] = m
     SSE = 0
     for i in range(0, length):
         SSE += (m_val[i]-np.dot(p[m_row[i], :], q[:, m_col[i]])) ** 2
