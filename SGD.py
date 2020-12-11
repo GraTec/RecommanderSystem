@@ -44,7 +44,7 @@ def SGD(m, a, maxK):
                 # for j in m_col:
                 #     q[k][j] = q[k][j]+2*a*_sum*tmp
         newSSE = computeSSE(m, p, q)
-        newRMSE = sqrt(newRMSE/length)
+        newRMSE = sqrt(newSSE/length)
         if abs(newRMSE-RMSE) <= 10**-4:
             print('', end='\n')
             return [p, q, RMSE]
