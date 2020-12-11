@@ -2,6 +2,7 @@ import numpy as np
 from SGD import SGD
 from loadData import loadData
 from nSGD import nSGD
+from biasSVD import biasSVD
 from math import sqrt
 import random
 from dataSplit import dataSplit, getTrainTest
@@ -27,6 +28,17 @@ def computeRMSE(m, p, q):
     return RMSE
 
 
+def computeRMSEbias(m, p, q, sigma, b_user, b_item):
+    [m_row, m_col, m_val] = m
+    length = len(m_row)
+    SSE = 0
+    for i in range(length):
+        SSE += (m_val[i]-np.dot(p[m_row[i], :], q[:, m_col[i]]) -
+                sigma-b_user[m_row[i]]-b_item[m_col[i]]) ** 2
+    RMSE = sqrt(SSE/length)
+    return RMSE
+
+
 def finalTest():
     # Reading data
     [m, implicit] = loadData()
@@ -44,9 +56,12 @@ def finalTest():
     print(computeRMSE(m_test, p, q))
     # print(p)
 
-    [p, q] = nSGD(m_train, 0.001, 10, 1)
+    [p, q] = nSGD(m_train, 0.005, 10, 0.1)
     print(computeRMSE(m_test, p, q))
     # print(p)
+
+    [p, q, sigma, b_user, b_item] = biasSVD(m_train, 0.0025, 10, 0.5)
+    print(computeRMSEbias(m_test, p, q, sigma, b_user, b_item))
 
 
 # test()
