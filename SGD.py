@@ -3,6 +3,13 @@ import time
 from math import sqrt
 
 
+def computeSSE(m, p, q):
+    SSE = 0
+    for i in range(0, length):
+        SSE += (m_val[i]-np.dot(p[m_row[i], :], q[:, m_col[i]])) ** 2
+    return SSE
+
+
 def SGD(m, a, maxK):
     print('Initializing...')
     [m_row, m_col, m_val] = m
@@ -18,10 +25,8 @@ def SGD(m, a, maxK):
         for j in m_col:
             q[k][j] = 1
     print('Computing first SSE...')
-    RMSE = 0
-    for i in range(0, length):
-        RMSE += (m_val[i]-np.dot(p[m_row[i], :], q[:, m_col[i]])) ** 2
-    RMSE = sqrt(RMSE/length)
+    SSE = computeSSE(m, p, q)
+    RMSE = sqrt(SSE/length)
     print('Initialization finished. RMSE=', RMSE, '. Factoring matrix...')
     while step <= 10**5:
         print('Running step', step, 'RMSE=', RMSE, end='\r')
@@ -38,9 +43,7 @@ def SGD(m, a, maxK):
                 #     p[i][k] = p[i][k]+2*a*_sum*q[k][item]
                 # for j in m_col:
                 #     q[k][j] = q[k][j]+2*a*_sum*tmp
-        newRMSE = 0
-        for i in range(0, length):
-            newRMSE += (m_val[i]-np.dot(p[m_row[i], :], q[:, m_col[i]])) ** 2
+        newSSE = computeSSE(m, p, q)
         newRMSE = sqrt(newRMSE/length)
         if abs(newRMSE-RMSE) <= 10**-4:
             print('', end='\n')
