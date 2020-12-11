@@ -14,7 +14,7 @@ def test():
 def finalTest():
     [m, implicit] = loadData()
     print(len(m[0]))
-    [p, q, SSE] = SGD([m[0][:10**3], m[1][:10**3], m[2][:10**3]], 0.025, 10)
+    [p, q, SSE] = SGD([m[0][:10**4], m[1][:10**4], m[2][:10**4]], 0.001, 5)
     print(SSE)
 
 
