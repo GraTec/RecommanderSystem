@@ -14,6 +14,16 @@ def dataSplit(m, dim):
     return [m2_row, m2_col, m2_val]
 
 
+def implicitSplit(implicit, dim):
+    [rowMax, colMax] = dim
+    im2 = [[] for i in range(0, rowMax)]
+    for i in range(0, rowMax):
+        for j in range(0, len(implicit[i])):
+            if implicit[i][j] < colMax:
+                im2[i].append(implicit[i][j])
+    return im2
+
+
 def getTrainTest(m, rate=0.8):
     [m_row, m_col, m_val] = m
     length = len(m_row)

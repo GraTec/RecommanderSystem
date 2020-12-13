@@ -28,7 +28,7 @@ def loadData():
     # m = np.zeros((userId, bookId))
     # implicit = np.zeros((userId, bookId))
     [m_row, m_col, m_val] = [[], [], []]
-    [implicit_row, implicit_col, implicit_val] = [[], [], []]
+    implicit = [[] for i in range(0, bookId)]
     with open('./BX-CSV-Dump/dataset.csv', newline='') as f:
         f_csv = csv.reader(f)
         headers = next(f_csv)
@@ -41,16 +41,14 @@ def loadData():
             book = bookSet[book]
             rate = rate.replace('"', '')
             if int(rate) == 0:
-                implicit_row.append(user)
-                implicit_col.append(book)
-                implicit_val.append(1)
+                implicit[user].append(book)
             else:
                 m_row.append(user)
                 m_col.append(book)
                 m_val.append(int(rate))
     # m = ss.coo_matrix((m_val, (m_row, m_col)))
     # implicit = ss.coo_matrix((implicit_val, (implicit_row, implicit_col)))
-    return [[m_row, m_col, m_val], [implicit_row, implicit_col, implicit_val]]
+    return [[m_row, m_col, m_val], implicit]
 
 
 if __name__ == "__main__":

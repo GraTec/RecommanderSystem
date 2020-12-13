@@ -46,10 +46,10 @@ def biasSVD(m, a, maxK, lamb):
                 p[user][k] = p[user][k]+a * \
                     (_sum * q[k][item]-lamb*p[user][k])/RMSE
                 q[k][item] = q[k][item]+a*(_sum*tmp-lamb*q[k][item])/RMSE
-        b_user[user] = b_user[user]+a * \
-            (_sum*length-lamb*b_user[user])/RMSE
-        b_item[item] = b_item[item]+a * \
-            (_sum*length-lamb*b_item[item])/RMSE
+            b_user[user] = b_user[user]+a * \
+                (_sum-lamb*b_user[user])/RMSE
+            b_item[item] = b_item[item]+a * \
+                (_sum-lamb*b_item[item])/RMSE
         # for i in m_row:
         #     p[i][k] = p[i][k]+2*a*_sum*q[k][item]
         # for j in m_col:

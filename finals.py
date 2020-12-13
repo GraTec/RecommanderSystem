@@ -4,9 +4,10 @@ from loadData import loadData
 from nSGD import nSGD
 from biasSVD import biasSVD
 from biasSVDweight import biasSVDweight
+from SVDplus import SVDplus
 from math import sqrt
 import random
-from dataSplit import dataSplit, getTrainTest
+from dataSplit import dataSplit, getTrainTest, implicitSplit
 
 
 def test():
@@ -41,12 +42,31 @@ def computeRMSEbias(m, p, q, sigma, b_user, b_item):
     return RMSE
 
 
+def sumy(y, implicit, user):
+    length = len(implicit[user])
+    vec = np.zeros((1, len(y[0])))
+    norm = 0
+    for j in implicit[user]:
+        vec = vec+y[j]
+        norm += np.linalg.norm(y[j])**2
+    return [vec, norm]
+
+
+def computeRMSEplus(m, p, q, sigma, b_user, b_item, y, implicit):
+    [m_row, m_col, m_val] = m
+    length = len(m_row)
+    SSE = 0
+    for i in range(0, length):
+        [vec, norm] = sumy(y, implicit, m_row[i])
+        SSE += (m_val[i]-np.dot(p[m_row[i], :]+vec/max(sqrt(len(y[m_row[i]])), 1),
+                                q[:, m_col[i]])-sigma-b_user[m_row[i]]-b_item[m_col[i]]) ** 2
+    RMSE = sqrt(SSE/length)
+    return RMSE
+
+
 def finalTest():
     # Reading data
     [m, implicit] = loadData()
-    [m_row, m_col, m_val] = m
-    [implicit_row, implicit_col, implicit_val] = implicit
-    length = len(m_row)
     # Reading finished
     # Split data
     dimMax = 10**3
@@ -56,6 +76,10 @@ def finalTest():
     [m2_train, m2_test] = getTrainTest(m1)
     m1 = dataSplit(m, [3*dimMax, 3*dimMax])
     [m3_train, m3_test] = getTrainTest(m1)
+    implicit1 = implicitSplit(implicit, [dimMax, dimMax])
+    implicit2 = implicitSplit(implicit, [2*dimMax, 2*dimMax])
+    implicit3 = implicitSplit(implicit, [3*dimMax, 3*dimMax])
+
     # Split finished
     [p1, q1] = SGD(m1_train, 0.001, 10)
     [p2, q2] = SGD(m2_train, 0.001, 10)
@@ -77,9 +101,9 @@ def finalTest():
     print(RMSE_nSGD)
     # print(p)
 
-    [p1, q1, sigma1, b_user1, b_item1] = biasSVD(m1_train, 0.0025, 10, 0.5)
-    [p2, q2, sigma2, b_user2, b_item2] = biasSVD(m2_train, 0.0001, 10, 0.5)
-    [p3, q3, sigma3, b_user3, b_item3] = biasSVD(m3_train, 0.0001, 10, 0.5)
+    [p1, q1, sigma1, b_user1, b_item1] = biasSVD(m1_train, 0.0001, 10, 0.1)
+    [p2, q2, sigma2, b_user2, b_item2] = biasSVD(m2_train, 0.0001, 10, 0.1)
+    [p3, q3, sigma3, b_user3, b_item3] = biasSVD(m3_train, 0.0001, 10, 0.1)
     RMSE_biasSVD = [0, 0, 0]
     RMSE_biasSVD[0] = computeRMSEbias(
         m1_test, p1, q1, sigma1, b_user1, b_item1)
@@ -90,11 +114,11 @@ def finalTest():
     print(RMSE_biasSVD)
 
     [p1, q1, sigma1, b_user1, b_item1] = biasSVDweight(
-        m1_train, 0.0025, 10, 0.5)
+        m1_train, 0.0001, 10, 0.1)
     [p2, q2, sigma2, b_user2, b_item2] = biasSVDweight(
-        m2_train, 0.0001, 10, 0.5)
+        m2_train, 0.0001, 10, 0.1)
     [p3, q3, sigma3, b_user3, b_item3] = biasSVDweight(
-        m3_train, 0.0001, 10, 0.5)
+        m3_train, 0.0001, 10, 0.1)
     RMSE_biasSVDweight = [0, 0, 0]
     RMSE_biasSVDweight[0] = computeRMSEbias(
         m1_test, p1, q1, sigma1, b_user1, b_item1)
@@ -112,5 +136,44 @@ def finalTest():
         f.close()
 
 
-test()
+def plusTest():
+    # Reading data
+    [m, implicit] = loadData()
+    # Reading finished
+    # Split data
+    dimMax = 10**3
+    m1 = dataSplit(m, [dimMax, dimMax])
+    [m1_train, m1_test] = getTrainTest(m1)
+    m1 = dataSplit(m, [2*dimMax, 2*dimMax])
+    [m2_train, m2_test] = getTrainTest(m1)
+    m1 = dataSplit(m, [3*dimMax, 3*dimMax])
+    [m3_train, m3_test] = getTrainTest(m1)
+    m1_train[3] = dimMax
+    m1_train[4] = dimMax
+    m2_train[3] = 2*dimMax
+    m2_train[4] = 2*dimMax
+    m3_train[3] = 3*dimMax
+    m3_train[4] = 3*dimMax
+    implicit1 = implicitSplit(implicit, [dimMax, dimMax])
+    implicit2 = implicitSplit(implicit, [2*dimMax, 2*dimMax])
+    implicit3 = implicitSplit(implicit, [3*dimMax, 3*dimMax])
+
+    [p1, q1, sigma1, b_user1, b_item1, y] = SVDplus(
+        m1_train, 0.0001, 10, 0.1, implicit1)
+    [p2, q2, sigma2, b_user2, b_item2, y] = SVDplus(
+        m2_train, 0.0001, 10, 0.01, implicit2)
+    [p3, q3, sigma3, b_user3, b_item3, y] = SVDplus(
+        m3_train, 0.0001, 10, 0.01, implicit3)
+    RMSE_SVDplus = [0, 0, 0]
+    RMSE_SVDplus[0] = computeRMSEplus(
+        m1_test, p1, q1, sigma1, b_user1, b_item1, y, implicit1)
+    RMSE_SVDplus[1] = computeRMSEplus(
+        m2_test, p2, q2, sigma2, b_user2, b_item2, y, implicit2)
+    RMSE_SVDplus[2] = computeRMSEplus(
+        m3_test, p3, q3, sigma3, b_user3, b_item3, y, implicit3)
+    print(RMSE_SVDplus)
+
+
+# test()
 # finalTest()
+plusTest()
