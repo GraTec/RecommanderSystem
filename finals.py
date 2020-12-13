@@ -10,13 +10,14 @@ from dataSplit import dataSplit, getTrainTest
 
 
 def test():
-    m_row = [0, 0, 1, 3]
+    m_row = [0, 0, 1, 4]
     m_col = [0, 4, 2, 1]
     m_val = [1, 2, 3, 4]
     [p, q] = SGD([m_row, m_col, m_val, 5, 5], 0.01, 3)
+    print(p, q)
     print(p.dot(q))
-    [p, q] = nSGD([m_row, m_col, m_val, 5, 5], 0.01, 3, 0.001)
-    print(p.dot(q))
+    # [p, q] = nSGD([m_row, m_col, m_val, 5, 5], 0.01, 3, 0.001)
+    # print(p.dot(q))
 
 
 def computeRMSE(m, p, q):
@@ -111,5 +112,5 @@ def finalTest():
         f.close()
 
 
-# test()
-finalTest()
+test()
+# finalTest()
