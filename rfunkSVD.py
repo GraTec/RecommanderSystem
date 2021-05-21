@@ -3,7 +3,7 @@ import time
 from math import sqrt
 
 
-def computeSSE(m, p, q, lamb):
+def computeSSE(m, p, q, lamb):  # 计算SSE，加入正则化系数
     [m_row, m_col, m_val] = m[0:3]
     length = len(m_row)
     SSE = 0
@@ -14,7 +14,7 @@ def computeSSE(m, p, q, lamb):
     return SSE
 
 
-def rfunkSVD(m, a, maxK, lamb, eps):
+def rfunkSVD(m, a, maxK, lamb, eps):  # m为评分矩阵，a为alpha参数，maxK为k的参数，lamb为正则化参数，eps为终止条件
     print('Initializing...')
     [m_row, m_col, m_val, row, col] = m
     length = len(m_row)
@@ -26,18 +26,20 @@ def rfunkSVD(m, a, maxK, lamb, eps):
             p[i][k] = np.random.rand()
         for j in m_col:
             q[k][j] = np.random.rand()
+    # 初始化完毕
     print('Computing first RMSE...')
     SSE = computeSSE(m, p, q, lamb)
     RMSE = sqrt(SSE/length)
+    # 初始RMSE误差计算完毕
     print('Initialization finished. RMSE=', RMSE, '. Factoring matrix...')
     while step <= 10**5:
         print('Running step', step, 'RMSE=', RMSE, end='\r')
         # time.sleep(0.5)
-        for i in range(0, length):
+        for i in range(0, length):  # 每一次迭代遍历所有变量
             user = m_row[i]
             item = m_col[i]
             _sum = m_val[i]-np.dot(p[user, :], q[:, item])
-            for k in range(0, maxK):
+            for k in range(0, maxK):  # 梯度下降法，对P,Q进行更新
                 tmp = p[user][k]
                 p[user][k] = p[user][k]+a * \
                     (_sum*q[k][item]-lamb*p[user][k])/RMSE
@@ -48,7 +50,7 @@ def rfunkSVD(m, a, maxK, lamb, eps):
                 #     q[k][j] = q[k][j]+2*a*_sum*tmp
         newSSE = computeSSE(m, p, q, lamb)
         newRMSE = sqrt(newSSE/length)
-        if abs(newRMSE-RMSE) <= eps:
+        if abs(newRMSE-RMSE) <= eps:  # 迭代终止判断
             print('', end='\n')
             return [p, q]
         step += 1
