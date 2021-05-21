@@ -12,7 +12,7 @@ def computeSSE(m, p, q):
     return SSE
 
 
-def SGD(m, a, maxK):
+def funkSVD(m, a, maxK, eps):
     print('Initializing...')
     [m_row, m_col, m_val, row, col] = m
     length = len(m_row)
@@ -52,3 +52,14 @@ def SGD(m, a, maxK):
         RMSE = newRMSE
     print('', end='\n')
     return [p, q]
+
+
+if __name__ == "__main__":
+    # m` = np.array([[1, 0, 0, 0, 2], [0, 0, 3, 0, 0], [
+    #  `            2, 0, 4, 2, 0], [0, 4, 0, 1, 0], [0, 4, 0, 0, 1]])
+    m = [[0, 0, 1, 2, 2, 2, 3, 3, 4, 4], [0, 4, 2, 0, 2,
+                                          3, 1, 3, 1, 4], [1, 2, 3, 2, 4, 2, 4, 1, 4, 1], 5, 5]
+    p, q = funkSVD(m, 0.01, 5, 1e-5)
+    print(p)
+    print(q)
+    print(p@q)
