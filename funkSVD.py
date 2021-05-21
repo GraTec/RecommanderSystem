@@ -45,7 +45,7 @@ def funkSVD(m, a, maxK, eps):
                 #     q[k][j] = q[k][j]+2*a*_sum*tmp
         newSSE = computeSSE(m, p, q)
         newRMSE = sqrt(newSSE/length)
-        if abs(newRMSE-RMSE) <= 10**-4:
+        if abs(newRMSE-RMSE) <= eps:
             print('', end='\n')
             return [p, q]
         step += 1
@@ -57,8 +57,11 @@ def funkSVD(m, a, maxK, eps):
 if __name__ == "__main__":
     # m` = np.array([[1, 0, 0, 0, 2], [0, 0, 3, 0, 0], [
     #  `            2, 0, 4, 2, 0], [0, 4, 0, 1, 0], [0, 4, 0, 0, 1]])
-    m = [[0, 0, 1, 2, 2, 2, 3, 3, 4, 4], [0, 4, 2, 0, 2,
-                                          3, 1, 3, 1, 4], [1, 2, 3, 2, 4, 2, 4, 1, 4, 1], 5, 5]
+    # m = [[0, 0, 1, 2, 2, 2, 3, 3, 4, 4], [0, 4, 2, 0, 2,
+    #                                       3, 1, 3, 1, 4], [1, 2, 3, 2, 4, 2, 4, 1, 4, 1], 5, 5]
+    m = [[0, 0, 1, 2, 2, 2, 3, 3, 4, 4, 4], [0, 4, 2, 0, 2,
+                                             3, 1, 3, 1, 4, 0], [1, 2, 3, 2, 4, 2, 4, 1, 4, 1, 5], 5, 5]
+
     p, q = funkSVD(m, 0.01, 5, 1e-5)
     print(p)
     print(q)

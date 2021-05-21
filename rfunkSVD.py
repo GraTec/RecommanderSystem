@@ -14,7 +14,7 @@ def computeSSE(m, p, q, lamb):
     return SSE
 
 
-def nSGD(m, a, maxK, lamb):
+def rfunkSVD(m, a, maxK, lamb, eps):
     print('Initializing...')
     [m_row, m_col, m_val, row, col] = m
     length = len(m_row)
@@ -48,10 +48,21 @@ def nSGD(m, a, maxK, lamb):
                 #     q[k][j] = q[k][j]+2*a*_sum*tmp
         newSSE = computeSSE(m, p, q, lamb)
         newRMSE = sqrt(newSSE/length)
-        if abs(newRMSE-RMSE) <= 10**-5:
+        if abs(newRMSE-RMSE) <= eps:
             print('', end='\n')
             return [p, q]
         step += 1
         RMSE = newRMSE
     print('', end='\n')
     return [p, q]
+
+
+if __name__ == "__main__":
+    # m` = np.array([[1, 0, 0, 0, 2], [0, 0, 3, 0, 0], [
+    #  `            2, 0, 4, 2, 0], [0, 4, 0, 1, 0], [0, 4, 0, 0, 1]])
+    m = [[0, 0, 1, 2, 2, 2, 3, 3, 4, 4, 4], [0, 4, 2, 0, 2,
+                                             3, 1, 3, 1, 4, 0], [1, 2, 3, 2, 4, 2, 4, 1, 4, 1, 5], 5, 5]
+    p, q = rfunkSVD(m, 0.01, 5, 0.2, 1e-6)
+    print(p)
+    print(q)
+    print(p@q)
