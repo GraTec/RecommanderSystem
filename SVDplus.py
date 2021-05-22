@@ -31,15 +31,10 @@ def SVDplus(m, a, maxK, lamb, implicit):
     length = len(m_row)
     [b_user, b_item, sigma] = [np.zeros(row), np.zeros(col), sum(m_val)/length]
     step = 1
-    p = np.zeros((row, maxK))
-    q = np.zeros((maxK, col))
-    y = np.zeros((col, maxK))
-    for k in range(0, maxK):
-        for i in m_row:
-            p[i][k] = np.random.rand()
-        for j in m_col:
-            q[k][j] = np.random.rand()
-            y[j][k] = 0
+    p = np.random.rand(row, maxK)
+    q = np.random.rand(maxK, col)
+    y = np.random.rand(col, maxK)
+
     print('Computing first RMSE...')
     SSE = computeSSE(m, p, q, lamb, b_user, b_item, sigma, y, implicit)
     RMSE = sqrt(SSE/length)

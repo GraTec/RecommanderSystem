@@ -18,10 +18,11 @@ def biasSVD(m, a, maxK, lamb, eps):
     print('Initializing...')
     [m_row, m_col, m_val, row, col] = m
     length = len(m_row)
-    [b_user, b_item, sigma] = [np.zeros(row), np.zeros(col), sum(m_val)/length]
     step = 1
     p = np.random.rand(row, maxK)
     q = np.random.rand(maxK, col)
+    b_user, b_item = np.random.rand(row), np.random.rand(col)
+    sigma = sum(m_val)/length
     # 初始化完毕
     print('Computing first RMSE...')
     SSE = computeSSE(m, p, q, lamb, b_user, b_item, sigma)
