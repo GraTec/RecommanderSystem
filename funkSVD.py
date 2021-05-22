@@ -17,13 +17,8 @@ def funkSVD(m, a, maxK, eps):  # m为评分矩阵，a为alpha参数，maxK为k�
     [m_row, m_col, m_val, row, col] = m
     length = len(m_row)
     step = 1
-    p = np.zeros((row, maxK))
-    q = np.zeros((maxK, col))
-    for k in range(0, maxK):
-        for i in m_row:
-            p[i][k] = np.random.rand()
-        for j in m_col:
-            q[k][j] = np.random.rand()
+    p = np.random.rand(row, maxK)
+    q = np.random.rand(maxK, col)
     # 初始化完毕
     print('Computing first RMSE...')
     SSE = computeSSE(m, p, q)
