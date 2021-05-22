@@ -203,9 +203,9 @@ def newTest():
     # print(p)
 
     # rfunk-SVD ###### rfunkSVD(m, a, maxK, lamb, eps)
-    [p1, q1] = rfunkSVD(m1_train, 0.005, 10, 0.1, 1e-5)
-    [p2, q2] = rfunkSVD(m2_train, 0.005, 10, 0.1, 1e-5)
-    [p3, q3] = rfunkSVD(m3_train, 0.005, 10, 0.1, 1e-5)
+    [p1, q1] = rfunkSVD(m1_train, 0.001, 10, 0.5, 1e-5)
+    [p2, q2] = rfunkSVD(m2_train, 0.001, 10, 0.5, 1e-5)
+    [p3, q3] = rfunkSVD(m3_train, 0.001, 10, 0.5, 1e-5)
     RMSE_rfunkSVD = [0, 0, 0]
     RMSE_rfunkSVD[0] = computeRMSE(m1_test, p1, q1)
     RMSE_rfunkSVD[1] = computeRMSE(m2_test, p2, q2)
