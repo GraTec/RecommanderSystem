@@ -41,13 +41,10 @@ def rfunkSVD(m, a, maxK, lamb, eps):  # m为评分矩阵，a为alpha参数，max
             _sum = m_val[i]-np.dot(p[user, :], q[:, item])
             ###### 更新P,Q ######
             tmp = p[user, :]  # 保存前一个状态的P_U
-            p[user, :] = (1-a*lamb/RMSE)*p[user, :]+a*_sum*q[:, item]/RMSE
-            q[:, item] = (1-a*lamb/RMSE)*q[:, item]+a*_sum*tmp/RMSE
-            # for k in range(0, maxK):  # 对P,Q进行更新
-            #     tmp = p[user][k]
-            #     p[user][k] = p[user][k]+a * \
-            #         (_sum*q[k][item]-lamb*p[user][k])/RMSE
-            #     q[k][item] = q[k][item]+a*(_sum*tmp-lamb*q[k][item])/RMSE
+            p[user, :] = (1-a*lamb/RMSE/length)*p[user, :] + \
+                a*_sum*q[:, item]/RMSE/length
+            q[:, item] = (1-a*lamb/RMSE/length)*q[:, item] + \
+                a*_sum*tmp/RMSE/length
 
         newSSE = computeSSE(m, p, q, lamb)
         newRMSE = sqrt(newSSE/length)  # 计算新的误差

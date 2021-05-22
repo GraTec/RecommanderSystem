@@ -14,7 +14,7 @@ def computeSSE(m, p, q, lamb, b_user, b_item, sigma):
     return SSE
 
 
-def biasSVD(m, a, maxK, lamb):
+def biasSVD(m, a, maxK, lamb, eps):
     print('Initializing...')
     [m_row, m_col, m_val, row, col] = m
     length = len(m_row)
@@ -27,35 +27,35 @@ def biasSVD(m, a, maxK, lamb):
             p[i][k] = np.random.rand()
         for j in m_col:
             q[k][j] = np.random.rand()
+    # 初始化完毕
     print('Computing first RMSE...')
     SSE = computeSSE(m, p, q, lamb, b_user, b_item, sigma)
     RMSE = sqrt(SSE/length)
+    # 计算初始误差完毕
     print('Initialization finished. RMSE=', RMSE, '. Factoring matrix...')
     while step <= 10**5:
         print('Running step', step, 'RMSE=', RMSE, end='\r')
         # time.sleep(0.5)
         b2_user = b_user
         b2_item = b_item
-        for i in range(0, length):
+        for i in range(0, length):  # 梯度下降法，每次迭代遍历所有变量
             user = m_row[i]
             item = m_col[i]
             _sum = m_val[i]-np.dot(p[user, :], q[:, item]) - \
                 sigma-b_user[user]-b_item[item]
-            for k in range(0, maxK):
-                tmp = p[user][k]
-                p[user][k] = p[user][k]+a * \
-                    (_sum * q[k][item]-lamb*p[user][k])/RMSE
-                q[k][item] = q[k][item]+a*(_sum*tmp-lamb*q[k][item])/RMSE
+            ###### 更新P,Q ######
+            tmp = p[user, :]  # 保存前一个状态的P_U
+            p[user, :] = (1-a*lamb/RMSE)*p[user, :] + \
+                a*_sum*q[:, item]/RMSE/length
+            q[:, item] = (1-a*lamb/RMSE)*q[:, item]+a*_sum*tmp/RMSE/length
+            # 更新偏置 b_user 和 b_item ######
             b_user[user] = b_user[user]+a * \
-                (_sum-lamb*b_user[user])/RMSE
+                (_sum-lamb*b_user[user])/RMSE/length
             b_item[item] = b_item[item]+a * \
-                (_sum-lamb*b_item[item])/RMSE
-        # for i in m_row:
-        #     p[i][k] = p[i][k]+2*a*_sum*q[k][item]
-        # for j in m_col:
-        #     q[k][j] = q[k][j]+2*a*_sum*tmp
+                (_sum-lamb*b_item[item])/RMSE/length
+
         newSSE = computeSSE(m, p, q, lamb, b_user, b_item, sigma)
-        newRMSE = sqrt(newSSE/length)
+        newRMSE = sqrt(newSSE/length)  # 计算新的误差
         if abs(newRMSE-RMSE) <= 10**-5:
             print('', end='\n')
             return [p, q, sigma, b_user, b_item]

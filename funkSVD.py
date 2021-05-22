@@ -39,8 +39,8 @@ def funkSVD(m, a, maxK, eps):  # m为评分矩阵，a为alpha参数，maxK为k�
             _sum = m_val[i]-np.dot(p[user, :], q[:, item])
             ###### 更新P,Q ######
             tmp = p[user, :]  # 保存前一个状态的P_U
-            p[user, :] = p[user, :]+a*_sum*q[:, item]/RMSE
-            q[:, item] = q[:, item]+a*_sum*tmp/RMSE
+            p[user, :] = p[user, :]+a*_sum*q[:, item]/RMSE/length
+            q[:, item] = q[:, item]+a*_sum*tmp/RMSE/length
 
         newSSE = computeSSE(m, p, q)
         newRMSE = sqrt(newSSE/length)  # 计算新的误差
