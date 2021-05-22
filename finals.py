@@ -1,7 +1,7 @@
 import numpy as np
-from SGD import SGD
+from funkSVD import funkSVD
 from loadData import loadData
-from nSGD import nSGD
+from rfunkSVD import rfunkSVD
 from biasSVD import biasSVD
 from biasSVDweight import biasSVDweight
 from SVDplus import SVDplus
@@ -81,24 +81,24 @@ def finalTest():
     implicit3 = implicitSplit(implicit, [3*dimMax, 3*dimMax])
 
     # Split finished
-    [p1, q1] = SGD(m1_train, 0.001, 10)
-    [p2, q2] = SGD(m2_train, 0.001, 10)
-    [p3, q3] = SGD(m3_train, 0.001, 10)
-    RMSE_SGD = [0, 0, 0]
-    RMSE_SGD[0] = computeRMSE(m1_test, p1, q1)
-    RMSE_SGD[1] = computeRMSE(m2_test, p2, q2)
-    RMSE_SGD[2] = computeRMSE(m3_test, p3, q3)
-    print(RMSE_SGD)
+    [p1, q1] = funkSVD(m1_train, 0.001, 10)
+    [p2, q2] = funkSVD(m2_train, 0.001, 10)
+    [p3, q3] = funkSVD(m3_train, 0.001, 10)
+    RMSE_funkSVD = [0, 0, 0]
+    RMSE_funkSVD[0] = computeRMSE(m1_test, p1, q1)
+    RMSE_funkSVD[1] = computeRMSE(m2_test, p2, q2)
+    RMSE_funkSVD[2] = computeRMSE(m3_test, p3, q3)
+    print(RMSE_funkSVD)
     # print(p)
 
-    [p1, q1] = nSGD(m1_train, 0.005, 10, 0.1)
-    [p2, q2] = nSGD(m2_train, 0.005, 10, 0.1)
-    [p3, q3] = nSGD(m3_train, 0.005, 10, 0.1)
-    RMSE_nSGD = [0, 0, 0]
-    RMSE_nSGD[0] = computeRMSE(m1_test, p1, q1)
-    RMSE_nSGD[1] = computeRMSE(m2_test, p2, q2)
-    RMSE_nSGD[2] = computeRMSE(m3_test, p3, q3)
-    print(RMSE_nSGD)
+    [p1, q1] = rfunkSVD(m1_train, 0.005, 10, 0.1)
+    [p2, q2] = rfunkSVD(m2_train, 0.005, 10, 0.1)
+    [p3, q3] = rfunkSVD(m3_train, 0.005, 10, 0.1)
+    RMSE_rfunkSVD = [0, 0, 0]
+    RMSE_rfunkSVD[0] = computeRMSE(m1_test, p1, q1)
+    RMSE_rfunkSVD[1] = computeRMSE(m2_test, p2, q2)
+    RMSE_rfunkSVD[2] = computeRMSE(m3_test, p3, q3)
+    print(RMSE_rfunkSVD)
     # print(p)
 
     [p1, q1, sigma1, b_user1, b_item1] = biasSVD(m1_train, 0.0001, 10, 0.1)
@@ -174,6 +174,81 @@ def plusTest():
     print(RMSE_SVDplus)
 
 
+def newTest():
+    # Reading data
+    [m, implicit] = loadData()
+    # Reading finished
+    # Split data
+    dimMax = 10**3
+    m1 = dataSplit(m, [dimMax, dimMax])
+    [m1_train, m1_test] = getTrainTest(m1)
+    m1 = dataSplit(m, [2*dimMax, 2*dimMax])
+    [m2_train, m2_test] = getTrainTest(m1)
+    m1 = dataSplit(m, [3*dimMax, 3*dimMax])
+    [m3_train, m3_test] = getTrainTest(m1)
+    implicit1 = implicitSplit(implicit, [dimMax, dimMax])
+    implicit2 = implicitSplit(implicit, [2*dimMax, 2*dimMax])
+    implicit3 = implicitSplit(implicit, [3*dimMax, 3*dimMax])
+    # Split finished
+
+    # Funk-SVD ###### funkSVD(m, a, maxK, eps)
+    [p1, q1] = funkSVD(m1_train, 0.001, 10, 1e-5)
+    [p2, q2] = funkSVD(m2_train, 0.001, 10, 1e-5)
+    [p3, q3] = funkSVD(m3_train, 0.001, 10, 1e-5)
+    RMSE_funkSVD = [0, 0, 0]
+    RMSE_funkSVD[0] = computeRMSE(m1_test, p1, q1)
+    RMSE_funkSVD[1] = computeRMSE(m2_test, p2, q2)
+    RMSE_funkSVD[2] = computeRMSE(m3_test, p3, q3)
+    print(RMSE_funkSVD)
+    # print(p)
+
+    # rfunk-SVD ###### rfunkSVD(m, a, maxK, lamb, eps)
+    [p1, q1] = rfunkSVD(m1_train, 0.005, 10, 0.1, 1e-5)
+    [p2, q2] = rfunkSVD(m2_train, 0.005, 10, 0.1, 1e-5)
+    [p3, q3] = rfunkSVD(m3_train, 0.005, 10, 0.1, 1e-5)
+    RMSE_rfunkSVD = [0, 0, 0]
+    RMSE_rfunkSVD[0] = computeRMSE(m1_test, p1, q1)
+    RMSE_rfunkSVD[1] = computeRMSE(m2_test, p2, q2)
+    RMSE_rfunkSVD[2] = computeRMSE(m3_test, p3, q3)
+    print(RMSE_rfunkSVD)
+    # # print(p)
+
+    # [p1, q1, sigma1, b_user1, b_item1] = biasSVD(m1_train, 0.0001, 10, 0.1)
+    # [p2, q2, sigma2, b_user2, b_item2] = biasSVD(m2_train, 0.0001, 10, 0.1)
+    # [p3, q3, sigma3, b_user3, b_item3] = biasSVD(m3_train, 0.0001, 10, 0.1)
+    # RMSE_biasSVD = [0, 0, 0]
+    # RMSE_biasSVD[0] = computeRMSEbias(
+    #     m1_test, p1, q1, sigma1, b_user1, b_item1)
+    # RMSE_biasSVD[1] = computeRMSEbias(
+    #     m2_test, p2, q2, sigma2, b_user2, b_item2)
+    # RMSE_biasSVD[2] = computeRMSEbias(
+    #     m3_test, p3, q3, sigma3, b_user3, b_item3)
+    # print(RMSE_biasSVD)
+
+    # [p1, q1, sigma1, b_user1, b_item1] = biasSVDweight(
+    #     m1_train, 0.0001, 10, 0.1)
+    # [p2, q2, sigma2, b_user2, b_item2] = biasSVDweight(
+    #     m2_train, 0.0001, 10, 0.1)
+    # [p3, q3, sigma3, b_user3, b_item3] = biasSVDweight(
+    #     m3_train, 0.0001, 10, 0.1)
+    # RMSE_biasSVDweight = [0, 0, 0]
+    # RMSE_biasSVDweight[0] = computeRMSEbias(
+    #     m1_test, p1, q1, sigma1, b_user1, b_item1)
+    # RMSE_biasSVDweight[1] = computeRMSEbias(
+    #     m2_test, p2, q2, sigma2, b_user2, b_item2)
+    # RMSE_biasSVDweight[2] = computeRMSEbias(
+    #     m3_test, p3, q3, sigma3, b_user3, b_item3)
+    # print(RMSE_biasSVDweight)
+
+    # with open('./result', 'w') as f:
+    #     f.write(str(RMSE_SGD))
+    #     f.write(str(RMSE_nSGD))
+    #     f.write(str(RMSE_biasSVD))
+    #     f.write(str(RMSE_biasSVDweight))
+    #     f.close()
+
+
 # test()
 # finalTest()
-plusTest()
+# plusTest()
+newTest()

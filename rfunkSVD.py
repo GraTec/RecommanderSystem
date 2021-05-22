@@ -35,21 +35,22 @@ def rfunkSVD(m, a, maxK, lamb, eps):  # m为评分矩阵，a为alpha参数，max
     while step <= 10**5:
         print('Running step', step, 'RMSE=', RMSE, end='\r')
         # time.sleep(0.5)
-        for i in range(0, length):  # 每一次迭代遍历所有变量
+        for i in range(0, length):  # 梯度下降法，每一次迭代遍历所有变量
             user = m_row[i]
             item = m_col[i]
             _sum = m_val[i]-np.dot(p[user, :], q[:, item])
-            for k in range(0, maxK):  # 梯度下降法，对P,Q进行更新
-                tmp = p[user][k]
-                p[user][k] = p[user][k]+a * \
-                    (_sum*q[k][item]-lamb*p[user][k])/RMSE
-                q[k][item] = q[k][item]+a*(_sum*tmp-lamb*q[k][item])/RMSE
-                # for i in m_row:
-                #     p[i][k] = p[i][k]+2*a*_sum*q[k][item]
-                # for j in m_col:
-                #     q[k][j] = q[k][j]+2*a*_sum*tmp
+            ###### 更新P,Q ######
+            tmp = p[user, :]  # 保存前一个状态的P_U
+            p[user, :] = (1-a*lamb/RMSE)*p[user, :]+a*_sum*q[:, item]/RMSE
+            q[:, item] = (1-a*lamb/RMSE)*q[:, item]+a*_sum*tmp/RMSE
+            # for k in range(0, maxK):  # 对P,Q进行更新
+            #     tmp = p[user][k]
+            #     p[user][k] = p[user][k]+a * \
+            #         (_sum*q[k][item]-lamb*p[user][k])/RMSE
+            #     q[k][item] = q[k][item]+a*(_sum*tmp-lamb*q[k][item])/RMSE
+
         newSSE = computeSSE(m, p, q, lamb)
-        newRMSE = sqrt(newSSE/length)
+        newRMSE = sqrt(newSSE/length)  # 计算新的误差
         if abs(newRMSE-RMSE) <= eps:  # 迭代终止判断
             print('', end='\n')
             return [p, q]
