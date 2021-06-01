@@ -42,13 +42,12 @@ def computeRMSEbias(m, p, q, sigma, b_user, b_item):
     return RMSE
 
 
-def sumy(y, implicit, user):
-    length = len(implicit[user])
+def sumy(y, implicit, user):  # 计算(Sum_j yj) 和 (Sum_j \|y_j\|^2)
     vec = np.zeros((1, len(y[0])))
     norm = 0
-    for j in implicit[user]:
-        vec = vec+y[j]
-        norm += np.linalg.norm(y[j])**2
+    for item in implicit[user]:
+        vec = vec+y[item]
+        norm += np.linalg.norm(y[item])**2
     return [vec, norm]
 
 
@@ -213,11 +212,11 @@ def newTest():
 
     # 偏置SVD算法 ###### biasSVD(m, a, maxK, lamb, eps)
     [p1, q1, sigma1, b_user1, b_item1] = biasSVD(
-        m1_train, 0.01, 50, 0.5, 1e-5)
+        m1_train, 1, 50, 0.25, 1e-5)
     [p2, q2, sigma2, b_user2, b_item2] = biasSVD(
-        m2_train, 0.01, 50, 0.5, 1e-5)
+        m2_train, 1, 50, 0.25, 1e-5)
     [p3, q3, sigma3, b_user3, b_item3] = biasSVD(
-        m3_train, 0.01, 50, 0.5, 1e-5)
+        m3_train, 1, 50, 0.25, 1e-5)
     RMSE_biasSVD = [0, 0, 0]
     RMSE_biasSVD[0] = computeRMSEbias(
         m1_test, p1, q1, sigma1, b_user1, b_item1)
@@ -226,6 +225,22 @@ def newTest():
     RMSE_biasSVD[2] = computeRMSEbias(
         m3_test, p3, q3, sigma3, b_user3, b_item3)
     print(RMSE_biasSVD)
+
+    # SVD++算法 ###### SVDplus(m, a, maxK, lamb, implicit)
+    [p1, q1, sigma1, b_user1, b_item1, y] = SVDplus(
+        m1_train, 1, 10, 0.5, implicit1)
+    [p2, q2, sigma2, b_user2, b_item2, y] = SVDplus(
+        m2_train, 1, 10, 0.5, implicit2)
+    [p3, q3, sigma3, b_user3, b_item3, y] = SVDplus(
+        m3_train, 1, 10, 0.5, implicit3)
+    RMSE_SVDplus = [0, 0, 0]
+    RMSE_SVDplus[0] = computeRMSEplus(
+        m1_test, p1, q1, sigma1, b_user1, b_item1, y, implicit1)
+    RMSE_SVDplus[1] = computeRMSEplus(
+        m2_test, p2, q2, sigma2, b_user2, b_item2, y, implicit2)
+    RMSE_SVDplus[2] = computeRMSEplus(
+        m3_test, p3, q3, sigma3, b_user3, b_item3, y, implicit3)
+    print(RMSE_SVDplus)
 
     # [p1, q1, sigma1, b_user1, b_item1] = biasSVDweight(
     #     m1_train, 0.0001, 10, 0.1)

@@ -41,9 +41,10 @@ def biasSVD(m, a, maxK, lamb, eps):
                 sigma-b_user[user]-b_item[item]
             ###### 更新P,Q ######
             tmp = p[user, :]  # 保存前一个状态的P_U
-            p[user, :] = (1-a*lamb/RMSE)*p[user, :] + \
+            p[user, :] = (1-a*lamb/RMSE/length)*p[user, :] + \
                 a*_sum*q[:, item]/RMSE/length
-            q[:, item] = (1-a*lamb/RMSE)*q[:, item]+a*_sum*tmp/RMSE/length
+            q[:, item] = (1-a*lamb/RMSE/length) * \
+                q[:, item]+a*_sum*tmp/RMSE/length
             # 更新偏置 b_user 和 b_item ######
             b_user[user] = b_user[user]+a * \
                 (_sum-lamb*b_user[user])/RMSE/length
