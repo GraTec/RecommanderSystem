@@ -16,8 +16,10 @@ def computeSSE(m, p, q, lamb, b_user, b_item, sigma, y, implicit):
     [m_row, m_col, m_val] = m[0:3]
     length = len(m_row)
     SSE = 0
+    [vec, norm] = sumy(y, implicit, m_row[0])
     for i in range(0, length):
-        [vec, norm] = sumy(y, implicit, m_row[i])
+        if i > 0 and m_row[i] != m_row[i-1]:
+            [vec, norm] = sumy(y, implicit, m_row[i])
         SSE += (m_val[i]-np.dot(p[m_row[i], :]+vec/max(sqrt(len(y[m_row[i]])), 1), q[:, m_col[i]])-sigma-b_user[m_row[i]]-b_item[m_col[i]]) ** 2+lamb * \
             (np.linalg.norm(p[m_row[i], :])**2 + np.linalg.norm(q[:, m_col[i]])
              ** 2+np.linalg.norm(b_user)**2+np.linalg.norm(b_item)**2 + norm)
@@ -27,7 +29,11 @@ def computeSSE(m, p, q, lamb, b_user, b_item, sigma, y, implicit):
 def SVDplus(m, a, maxK, lamb, implicit):
     print('Initializing...')
     [m_row, m_col, m_val, row, col] = m
-    col = max(col, (np.max(implicit)+1))
+    # print(np.max(np.max(implicit)))
+    for i in range(len(implicit)):
+        if implicit[i] == []:
+            continue
+        col = max(col, np.max(implicit[i])+1)
     length = len(m_row)
     step = 1
     p = np.random.rand(row, maxK)
